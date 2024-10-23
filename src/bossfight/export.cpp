@@ -1,5 +1,5 @@
 #include "game.hpp"
 #include <libidk/idk_export.hpp>
 
-IDK_EXPORT_GAME(DemoMilsim);
+IDK_EXPORT_GAME(DemoBossfight);
 

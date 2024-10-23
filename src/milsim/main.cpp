@@ -44,8 +44,8 @@ DemoMilsim::setup( const std::vector<std::string> &args, idk::EngineAPI &api )
     }
 
 
-    ren.pushRenderOverlayFill(glm::vec3(0.0f), 0.0f, 6.25f, 0.25f);
-    ren.pushRenderOverlay("assets/dream-demon-logo.png", 0.5f, 4.0f, 0.5f);
+    // ren.pushRenderOverlayFill(glm::vec3(0.0f), 0.0f, 6.25f, 0.25f);
+    // ren.pushRenderOverlay("assets/dream-demon-logo.png", 0.5f, 4.0f, 0.5f);
 }
 
 

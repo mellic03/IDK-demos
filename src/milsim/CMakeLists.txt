@@ -6,7 +6,7 @@ set(PROJECT_VERSION_MINOR 1)
 
 
 file(GLOB SOURCES
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
 
 
@@ -18,6 +18,12 @@ set_target_properties(
     ${PROJECT_NAME} PROPERTIES
     POSITION_INDEPENDENT_CODE ON
 )
+
+set_target_properties(
+    ${PROJECT_NAME} PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/output/
+)
+
 
 if (IDK_DEBUG)
     target_compile_options(${PROJECT_NAME} PUBLIC -Werror -fsanitize=undefined -lstdc++fs -g)
@@ -42,16 +48,4 @@ target_link_libraries(
     ImGui
     IDKBuiltinUI
 )
-
-
-
-# FILE(
-#     COPY ${CMAKE_CURRENT_SOURCE_DIR}/assets/
-#     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/
-# )
-
-# FILE(
-#     COPY ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders/
-#     DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/assets/shaders/
-# )
 
