@@ -1,0 +1,12 @@
+[submodule "external/IDKGraphics"]
+	path = external/IDKGraphics
+	url = https://github.com/mellic03/IDKGraphics.git
+[submodule "external/IDKGameEngine"]
+	path = external/IDKGameEngine
+	url = https://github.com/mellic03/IDKGameEngine.git
+[submodule "external/libidk"]
+	path = external/libidk
+	url = https://github.com/mellic03/libidk.git
+[submodule "external/glm"]
+	path = external/glm
+	url = https://github.com/g-truc/glm.git
