@@ -7,7 +7,6 @@ set(PROJECT_VERSION_MINOR 1)
 
 file(GLOB SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../demo-common/*.cpp
 )
 
 
@@ -44,8 +43,5 @@ target_link_libraries(
     IDKEvents
     IDKBuiltinCS
     IDKECS
-
-    ImGui
-    IDKBuiltinUI
 )
 

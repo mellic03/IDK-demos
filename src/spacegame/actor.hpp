@@ -19,12 +19,16 @@ namespace sp
 
 class sp::Actor
 {
-private:
+protected:
     idk::EngineAPI &m_api;
     sp::World &m_world;
+    glm::vec3 m_pos;
+
+private:
+
 
 public:
-    glm::vec3 pos;
+    glm::vec3 &pos;
     Actor( idk::EngineAPI&, World&, const glm::vec3 &p = glm::vec3(0.0f) );
 
     virtual void update() {  };
@@ -34,7 +38,7 @@ public:
 class sp::ActorVisible: public sp::Actor
 {
 private:
-    idk::RenderNode *m_rendernode;
+    int m_nodeid;
 
 public:
     ActorVisible( idk::EngineAPI&, World&, const glm::vec3 &p = glm::vec3(0.0f) );
