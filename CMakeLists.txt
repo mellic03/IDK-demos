@@ -57,14 +57,20 @@ include_directories(${CMAKE_SOURCE_DIR}/external/glew-2.1.0/include/)
 include_directories(${CMAKE_SOURCE_DIR}/external/libidk/src/)
 include_directories(${CMAKE_SOURCE_DIR}/external/IDKGraphics/src/)
 include_directories(${CMAKE_SOURCE_DIR}/external/IDKGameEngine/src/)
+include_directories(${CMAKE_SOURCE_DIR}/src/)
+
 
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/glm/glm/)
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/libidk/)
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/IDKGraphics/)
 add_subdirectory(${CMAKE_SOURCE_DIR}/external/IDKGameEngine/)
 
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/bossfight/)
-add_subdirectory(${CMAKE_SOURCE_DIR}/src/milsim/)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/src/bossfight/)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/src/flightsim/)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/src/flightsim-editor/)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/src/watercraft/)
+# add_subdirectory(${CMAKE_SOURCE_DIR}/src/planets/)
+add_subdirectory(${CMAKE_SOURCE_DIR}/src/spacegame/)
 
 
 FILE(

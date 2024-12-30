@@ -7,11 +7,12 @@
 #include <string>
 
 
-class IDK_VISIBLE DemoBossfight: public idk::Game
+class IDK_VISIBLE DemoFlightsim: public idk::Game
 {
 public:
-    virtual std::string getName() final { return "BossFight"; }
+    virtual std::string getName() final { return "Flightsim Editor"; };
 
+    virtual void build           (                 ) final {  };
     virtual void registerModules ( idk::EngineAPI& ) final;
     virtual void setup           ( const std::vector<std::string>&, idk::EngineAPI& ) final;
     virtual void mainloop        ( idk::EngineAPI& ) final;
