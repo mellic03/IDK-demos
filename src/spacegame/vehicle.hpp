@@ -13,7 +13,7 @@ namespace sp
 
 
 
-class sp::VehicleSys: public idk::ECS2::System
+class sp::VehicleSys: public idk::ECS::System
 {
 private:
 

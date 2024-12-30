@@ -10,7 +10,7 @@ namespace fsim
 };
 
 
-class fsim::AircraftSys: public idk::ECS2::System
+class fsim::AircraftSys: public idk::ECS::System
 {
 public:
     virtual void init   ( idk::EngineAPI& ) final {  };

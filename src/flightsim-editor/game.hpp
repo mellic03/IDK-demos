@@ -10,7 +10,7 @@
 class IDK_VISIBLE DemoFlightsimEditor: public idk::Game
 {
 public:
-    virtual std::string getName() final { return "Flightsim"; };
+    virtual std::string getName() final { return "Flightsim Editor"; };
 
     virtual void build           (                 ) final;
     virtual void registerModules ( idk::EngineAPI& ) final;

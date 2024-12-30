@@ -5,6 +5,7 @@
 #include <IDKIO/IDKIO.hpp>
 
 #include <IDKECS/IDKECS.hpp>
+#include <IDKECS/ecs1/idk_ecs.hpp>
 #include <IDKBuiltinCS/sys-script.hpp>
 
 #include "game.hpp"
@@ -34,8 +35,8 @@ DemoSpaceGame::setup( const std::vector<std::string> &args, idk::EngineAPI &api 
     using namespace idk;
 
     auto &engine = api.getEngine();
+    auto &ecs    = api.getECS();
     auto &ren    = api.getRenderer();
-
 
     if (world)
     {
@@ -44,7 +45,7 @@ DemoSpaceGame::setup( const std::vector<std::string> &args, idk::EngineAPI &api 
 
     world = new sp::World(api);
     world->createActor<sp::Player>(glm::vec3(0.0f, 0.0f, 0.0f));
-    // world->createActor<sp::ActorVisible>(glm::vec3(0.0f, 2.0f, 0.0f));
+    world->createActor<sp::ActorVisible>(glm::vec3(0.0f, 2.0f, 0.0f));
 }
 
 
@@ -57,7 +58,6 @@ DemoSpaceGame::mainloop( idk::EngineAPI &api )
     float dt  = api.dtime();
 
     world->update();
-
 
 }
 

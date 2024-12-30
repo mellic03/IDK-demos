@@ -10,7 +10,7 @@
 class IDK_VISIBLE DemoPlanets: public idk::Game
 {
 public:
-    virtual std::string getName() final { return "WaterCraft"; }
+    virtual std::string getName() final { return "Planets"; }
 
     virtual void registerModules ( idk::EngineAPI& ) final;
     virtual void setup           ( const std::vector<std::string>&, idk::EngineAPI& ) final;
