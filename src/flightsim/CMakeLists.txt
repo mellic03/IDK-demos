@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.9)
-project(Flightsim)
+project(FlightSim)
 
 set(PROJECT_VERSION_MAJOR 0)
 set(PROJECT_VERSION_MINOR 1)
@@ -7,15 +7,21 @@ set(PROJECT_VERSION_MINOR 1)
 
 file(GLOB SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../demo-common/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../flightsim-common/*.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/../flightsim-common/physics/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/character/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/dev-ui/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/game-ui/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/item/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/world/world/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/world/item/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/world/weapon/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/world/character/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/world/aircraft/*.cpp
 )
 
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_23)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
@@ -24,7 +30,7 @@ set_target_properties(
 
 set_target_properties(
     ${PROJECT_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/output/
+    LIBRARY_OUTPUT_DIRECTORY ${IDK_OUTPUT_DIRECTORY}/
 )
 
 
@@ -45,6 +51,15 @@ target_link_libraries(
     IDKAudio
     IDKEvents
     IDKBuiltinCS
+    IDKBuiltinUI
+    # IDKEditorUI
     IDKECS
+    IDKPhysics
 )
 
+
+
+FILE(
+    COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
+    DESTINATION ${IDK_OUTPUT_DIRECTORY}/.
+)

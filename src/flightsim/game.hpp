@@ -6,17 +6,34 @@
 
 #include <string>
 
+namespace idk
+{
+    class ECS;
+    class World;
+}
+
+namespace evo
+{
+    class GUI;
+    class Player;
+}
+
 
 class IDK_VISIBLE DemoFlightsim: public idk::Game
 {
-public:
-    virtual std::string getName() final { return "Flightsim"; };
+private:
+    evo::GUI    *gameui   = nullptr;
+    idk::World  *world    = nullptr;
+    evo::Player *player   = nullptr;
 
-    virtual void build           (                 ) final {  };
-    virtual void registerModules ( idk::EngineAPI& ) final;
-    virtual void setup           ( const std::vector<std::string>&, idk::EngineAPI& ) final;
+
+public:
+
+    virtual std::string getName() final { return "Evolution"; }
+
+    // virtual void registerModules ( idk::EngineAPI& ) final;
+    virtual void setup           ( idk::EngineAPI& ) final;
     virtual void mainloop        ( idk::EngineAPI& ) final;
     virtual void shutdown        (                 ) final;
-
 };
 

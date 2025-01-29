@@ -1,5 +1,9 @@
 build
+build-debug
+build-release
 output
+output-debug
+output-release
 external/glew-2.1.0
 
 src/assets/models
