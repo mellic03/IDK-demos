@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <libidk/idk_log2.hpp>
+
 #include <IDKGraphics/UI/idk_ui.hpp>
 #include <IDKGameEngine/IDKGameEngine.hpp>
 #include <IDKIO/IDKIO.hpp>
@@ -8,7 +10,6 @@
 #include <IDKBuiltinCS/sys-script.hpp>
 #include <IDKBuiltinCS/sys-gui.hpp>
 #include <IDKPhysics/IDKPhysics.hpp>
-#include <IDKPhysics/body/airfoil.hpp>
 
 #include "game.hpp"
 #include "gui.hpp"
@@ -27,6 +28,7 @@
 
 #include "player.hpp"
 
+idk::phys::StaticBody *plane;
 
 
 void
@@ -38,11 +40,14 @@ DemoFlightsim::setup( idk::EngineAPI &api )
     auto &ecs    = api.getECS();
     auto &ren    = api.getRenderer();
 
+    ecs.registerComponent<evo::PlayerCmp>("Player", "Flightsim");
+    ecs.setUserCallback<evo::PlayerCmp>(evo::PlayerCmpDraw);
+
+
     idk::RuntimeScript::setCompilerLib("-lFlightSim");
 
     int id = api.getEngine().registerModule("IDKGE/modules/libIDKBuiltinUI");
     auto &mod = api.getEngine().getModule<EditorUI_MD>(id);
-
     mod.insertImGui([this](idk::EngineAPI &api) { EvoDevUI::rigid_bodies(api, *(world->physworld)); });
     mod.insertImGui([this](idk::EngineAPI &api) { EvoDevUI::constraints(api, *(world->physworld)); });
     mod.insertImGui([this](idk::EngineAPI &api) { EvoDevUI::world_settings(api, *(world->physworld)); });
@@ -51,7 +56,7 @@ DemoFlightsim::setup( idk::EngineAPI &api )
 
     if (gameui == nullptr)
     {
-        gameui = new evo::GUI();
+        gameui = new evo::GUI(api);
     }
 
     if (world)
@@ -63,11 +68,15 @@ DemoFlightsim::setup( idk::EngineAPI &api )
 
     world = new idk::World(api);
     player = world->createActor<evo::Player>(glm::vec3(0.0f, 16.0f, 0.0f));
-    auto *V = world->createActor<idk::Helicopter>(glm::vec3(2.0f, 8.0f, -1.3f));
-    // auto *V = world->createActor<idk::FighterJet>(glm::vec3(2.0f, 8.0f, -1.3f));
-    V->drive(player);
+    // auto *V = world->createActor<idk::Helicopter>(glm::vec3(8.0f, 16.0f, -32.0f));
+    auto *V2 = world->createActor<idk::FighterJet>(glm::vec3(-8.0f, 16.0f, -32.3f));
 
-    world->physworld->createBody<phys::StaticBody>(glm::vec3(0.0f), new phys::ShapeHeightmap());
+    // world->physworld->config.gravity.y = 0.0f;
+
+    world->physworld->createBody<phys::StaticBody>(glm::vec3(0.0f), phys::SHAPE_HEIGHTMAP);
+    plane = world->physworld->createBody<phys::StaticBody>(glm::vec3(0, 0, -32), phys::SHAPE_AABB);
+    plane->shape.extents = glm::vec3(128, 4, 128);
+    plane->state.invMass = 0.0f;
 
     // player->equipItem(world->createItem<idk::WeaponAK47>());
     // idk::phys::createRope(*world->physworld, V->getBody());
@@ -80,6 +89,7 @@ DemoFlightsim::setup( idk::EngineAPI &api )
     ecs.giveComponent<idk::TerrainCmp>(obj);
     ecs.getComponent<idk::TransformCmp>(obj).transform.position = glm::vec3(0, -700, 0);
     ecs.getComponent<idk::TransformCmp>(obj).transform.scale    = glm::vec4(2222, 1, 1, 1);
+
 }
 
 
@@ -92,19 +102,11 @@ DemoFlightsim::mainloop( idk::EngineAPI &api )
     auto &ren = api.getRenderer();
     float dt  = api.dtime();
 
-    for (auto *B: world->physworld->rigidBodies())
-    {
-        ren.drawSphere(B->getRenderMatrix(), B->getRenderMatrixPrev());
-    
-        for (auto *C: B->m_children)
-        {
-            ren.drawSphere(C->getRenderMatrix(), C->getRenderMatrixPrev());
-        }
-    }
+    ren.drawRect(plane->getRenderMatrix(true));
+
 
     world->render(ren);
     world->update(dt);
-
     gameui->update(api, player);
 }
 
@@ -112,7 +114,7 @@ DemoFlightsim::mainloop( idk::EngineAPI &api )
 void
 DemoFlightsim::shutdown()
 {
-    LOG_INFO() << "DemoFlightsim::shutdown";
+    LOG_INFO("DemoFlightsim::shutdown");
     // delete gameui;
     // delete world;
 }

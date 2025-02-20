@@ -9,11 +9,11 @@
 fsim::ElementFlightVector *flightVectors;
 fsim::CharacterInventoryGUI *inv;
 
-evo::GUI::GUI()
+evo::GUI::GUI( idk::EngineAPI &api )
 {
     using namespace spstyle;
 
-    m_LM = new idkui::LayoutManager("assets/font/RodettaStamp.ttf", 24);
+    m_LM = new idkui::LayoutManager(api.getIO(), "assets/font/RodettaStamp.ttf", 24);
     m_root = new idkui::Grid(3, 3, root_style);
 
 

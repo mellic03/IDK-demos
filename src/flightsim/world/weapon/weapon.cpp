@@ -103,15 +103,14 @@ void idk::Weapon::hide()
 
 
 
-bool
+void
 idk::Weapon::fire()
 {
-    auto &ecs  = m_api.getECS();
-    auto &asys = ecs.getSystem<idk::AudioSys>();
-    auto &ssys = ecs.getSystem<idk::ScriptSys>();
-
     if (m_timer <= 0.0f)
     {
+        auto &ecs  = m_api.getECS();
+        auto &asys = ecs.getSystem<idk::AudioSys>();
+        auto &ssys = ecs.getSystem<idk::ScriptSys>();
         // ssys.executeScript(m_obj, "weapon-fire", dynamic_cast<void*>(this));
 
         asys.playSound(m_obj, false);
@@ -123,10 +122,7 @@ idk::Weapon::fire()
         this->sway_pos += glm::vec3(rx, ry, rz);
 
         m_timer = m_conf.cooldown;
-        return true;
     }
-
-    return false;
 }
 
 

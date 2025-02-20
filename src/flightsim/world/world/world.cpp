@@ -3,9 +3,6 @@
 #include "item.hpp"
 #include <IDKIO/IDKIO.hpp>
 
-// #include <libidk/idk_cppscript.hpp>
-// static idk::RuntimeScript *config_script = nullptr;
-
 
 idk::World::World( idk::EngineAPI &api )
 :   m_api(api)
@@ -13,38 +10,26 @@ idk::World::World( idk::EngineAPI &api )
     physworld = new idk::phys::World();
     physworld->config.gravity.y = -9.8f;
     physworld->config.fluid_density = 0.95f;
-
-    // config_script = new idk::RuntimeScript("assets/scripts/weapon-config");
 }
 
 
 idk::World::~World()
 {
     for (Actor *A: m_actors)
-    {
         delete A;
-    }
 
+    std::vector<int> cull;
     for (auto &[id, I]: m_items)
-    {
+        cull.push_back(id);
+
+    for (int id: cull)
         m_items.destroy(id);
-    }
 }
 
 
 void
 idk::World::update( float dt )
 {
-    // if (m_api.getIO().keyTapped(idk::Keycode::P))
-    //     config_script->reload();
-
-    // if (config_script->is_ready() == false)
-    // {
-    //     return;
-    // }
-
-    // config_script->execute(m_api, nullptr);
-
     for (idk::Actor *A: m_actors)
     {
         A->update();
@@ -57,8 +42,16 @@ idk::World::update( float dt )
             I->update();
         }
     }
+    
+    if (physworld->update(dt))
+    {
+        float timestep = 1.0f / float(physworld->config.tickrate);
 
-    physworld->update(dt);
+        for (idk::Actor *A: m_actors)
+        {
+            A->fixedUpdate(timestep);
+        }
+    }
 }
 
 
@@ -75,23 +68,23 @@ idk::World::render( idk::RenderEngine &ren )
         I->render(ren);
     }
 
-    // for (auto *B: physworld->rigidBodies())
-    // {
-    //     ren.drawSphere(B->getRenderMatrix(), B->getRenderMatrixPrev());
-    
-    //     for (auto *C: B->m_children)
-    //     {
-    //         ren.drawSphere(C->getRenderMatrix(), C->getRenderMatrixPrev());
-    //     }
-    // }
-
-    for (auto &[id, C]: physworld->constraints())
+    for (auto *B: physworld->rigidBodies())
     {
-        glm::vec3 Apos = C->getBodyA()->state.pos;
-        glm::vec3 Bpos = C->getBodyB()->state.pos;
-        float mass = glm::min(C->getBodyA()->getMass(), C->getBodyB()->getMass());
-        ren.drawLine(Apos, Bpos, mass);
+        ren.drawSphere(B->getRenderMatrix(true));
+    
+        // for (auto *C: B->m_children)
+        // {
+        //     ren.drawSphere(C->getRenderMatrix(), C->getRenderMatrixPrev());
+        // }
     }
+
+    // for (auto &[id, C]: physworld->constraints())
+    // {
+    //     glm::vec3 Apos = C->getBodyA()->state.pos;
+    //     glm::vec3 Bpos = C->getBodyB()->state.pos;
+    //     float mass = glm::min(C->getBodyA()->getMass(), C->getBodyB()->getMass());
+    //     ren.drawLine(Apos, Bpos, mass);
+    // }
 }
 
 

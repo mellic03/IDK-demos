@@ -20,6 +20,7 @@ public:
 
     FighterJet( idk::EngineAPI&, idk::World&, const glm::vec3& );
     virtual void update() override;
+    virtual void fixedUpdate( float ) override;
 
     virtual glm::vec3 getSeatPosition() const override;
 

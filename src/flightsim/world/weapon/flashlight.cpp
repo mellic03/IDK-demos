@@ -39,7 +39,7 @@ idk::WeaponFlashlight::WeaponFlashlight( idk::EngineAPI &api, World &world )
 
 
 
-bool
+void
 idk::WeaponFlashlight::fire()
 {
     auto &ecs  = m_api.getECS();
@@ -55,7 +55,5 @@ idk::WeaponFlashlight::fire()
 
     m_on = !m_on;
     asys.playSound(m_obj, false);
-
-    return false;
 }
 

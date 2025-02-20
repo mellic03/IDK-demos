@@ -32,6 +32,13 @@ idk::Actor::update()
 
 
 void
+idk::Actor::fixedUpdate( float timestep )
+{
+
+}
+
+
+void
 idk::Actor::render( idk::RenderEngine &ren )
 {
 

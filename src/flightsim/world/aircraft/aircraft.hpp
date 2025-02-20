@@ -2,7 +2,6 @@
 
 #include <flightsim/world/world/vehicle.hpp>
 #include <IDKPhysics/body/rigidbody.hpp>
-#include <IDKPhysics/body/airfoil.hpp>
 
 
 namespace idk
@@ -30,7 +29,7 @@ protected:
     phys::RigidBody *m_body;
 
     int  m_callback_id;
-    void _joystick_callback( uint8_t, float );
+    void _jscallback( uint8_t, float );
 
     
 public:
@@ -38,7 +37,7 @@ public:
     Aircraft( idk::EngineAPI&, idk::World&, const glm::vec3& );
     ~Aircraft();
 
-    auto *getBody() { return m_body; }
+    auto &getBody() { return m_body; }
     auto &getCtl()  { return m_ctl;  }
 
 };

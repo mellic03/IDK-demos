@@ -91,7 +91,11 @@
         "*.inc": "cpp",
         "hash_map": "cpp",
         "hash_set": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "shared_mutex": "cpp",
+        "codecvt": "cpp",
+        "iomanip": "cpp",
+        "coroutine": "cpp"
     },
     "C_Cpp.default.includePath": [
         "${default}",

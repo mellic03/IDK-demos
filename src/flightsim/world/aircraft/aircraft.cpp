@@ -11,18 +11,18 @@
 
 
 void
-idk::Aircraft::_joystick_callback( uint8_t axis, float value )
+idk::Aircraft::_jscallback( uint8_t axis, float value )
 {
-    // scale value to [-0.5, +0.5] range
-    value = 0.5f - (value + 32768) / (32767 + 32768);
+    // scale value to [0, 1] range
+    value = (value + 32768) / (32767 + 32768);
 
     switch (axis)
     {
         default: break;
-        case 0: m_ctl.roll     = value; break;
-        case 1: m_ctl.pitch    = value; break;
-        case 2: m_ctl.yaw      = value; break;
-        case 3: m_ctl.throttle = value+0.5f; break;
+        case 0: m_ctl.roll     = 2.0f * (value-0.5f); break;
+        case 1: m_ctl.pitch    = 2.0f * (value-0.5f); break;
+        case 2: m_ctl.yaw      = 2.0f * (value-0.5f); break;
+        case 3: m_ctl.throttle = value; break;
     }
 }
 
@@ -30,12 +30,12 @@ idk::Aircraft::_joystick_callback( uint8_t axis, float value )
 
 idk::Aircraft::Aircraft( idk::EngineAPI &api, idk::World &world, const glm::vec3 &p )
 :   Vehicle(api, world, p),
-    m_body(world.physworld->createBody<phys::RigidBody>(p))
+    m_body(world.physworld->createBody<phys::RigidBody>(p, phys::SHAPE_SPHERE))
 {
     auto &io = api.getIO();
 
-    m_callback_id = io.joystickAxisCreateCallback(
-        [this](uint8_t axis, float value) { return _joystick_callback(axis, value); }
+    m_callback_id = io.onJoystickAxis(
+        [this](uint8_t a, float b) { return _jscallback(a, b); }
     );
 }
 
@@ -43,6 +43,5 @@ idk::Aircraft::Aircraft( idk::EngineAPI &api, idk::World &world, const glm::vec3
 idk::Aircraft::~Aircraft()
 {
     auto &io = m_api.getIO();
-    io.JoystickAxisRemoveCallback(m_callback_id);
-
+    io.removeCallback(m_callback_id);
 }

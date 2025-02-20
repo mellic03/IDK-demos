@@ -23,19 +23,13 @@ idk::Character::Character( idk::EngineAPI &api, idk::World &world, const glm::ve
 void
 idk::Character::update()
 {
-    auto &ecs  = m_api.getECS();
-    auto &tsys = ecs.getSystem<idk::TransformSys>();
-    float dt   = m_api.dtime();
+    float dt = m_api.dtime();
 
-    // tsys.yaw(m_obj, dt*m_ang.x);
-    // tsys.pitch(m_obj, dt*m_ang.y);
-    // tsys.roll(m_obj, dt*m_ang.z);
+    m_ctl.dmove = idk::flerp(m_ctl.dmove, glm::vec3(0.0f), dt, m_ctl.move_decay);
+    m_ctl.dlook = idk::flerp(m_ctl.dlook, glm::vec3(0.0f), dt, m_ctl.look_decay);
 
-    // m_vel = idk::flerp(m_vel, glm::vec3(0.0f), dt, 0.9f);
-    // m_ang = idk::flerp(m_ang, glm::vec3(0.0f), dt, 0.9f);
-
-    m_dlook = idk::flerp(m_dlook, glm::vec3(0.0f), dt, 0.9f);
-    m_dmove = idk::flerp(m_dmove, glm::vec3(0.0f), dt, 0.9f);
+    this->move(m_ctl.dmove);
+    this->look(m_ctl.dlook);
 }
 
 

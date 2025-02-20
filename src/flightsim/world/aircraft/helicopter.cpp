@@ -15,21 +15,40 @@
 idk::Helicopter::Helicopter( idk::EngineAPI &api, idk::World &world, const glm::vec3 &p )
 :   Aircraft(api, world, p)
 {
-    m_body->setMass(1024.0f);
-    m_body->setRestitution(0.66f);
-    m_body->setDrag(0.05f);
+    m_body->state.invMass = 1.0f / 128.0f; // ->setMass(8.0f);
+    m_body->state.restitution = 0.45f;
+    m_body->state.drag = 0.25f;
+    m_body->shape.extents = glm::vec3(4.0f);
+    m_body->shape.radius = 4.0f;
 
     auto &pw = *(world.physworld);
 
-    // auto *B0 = pw.createBody<phys::RigidBody>(glm::vec3(-8, -12,  8));
-    // auto *B1 = pw.createBody<phys::RigidBody>(glm::vec3(+8, -12,  8));
-    // auto *B2 = pw.createBody<phys::RigidBody>(glm::vec3(-8, -12, -8));
-    // auto *B3 = pw.createBody<phys::RigidBody>(glm::vec3(+8, -12, -8));
+    auto *B0 = pw.createBody<phys::RigidBody>(6.0f * glm::vec3(-1,  0.01,  0) + glm::vec3(0, 128, 0));
+    // auto *B1 = pw.createBody<phys::RigidBody>(6.0f * glm::vec3(+1,  0.02,  0) + glm::vec3(0, 128, 0));
+    // auto *B2 = pw.createBody<phys::RigidBody>(6.0f * glm::vec3( 0, -0.1,  -1) + glm::vec3(0, 128, 0));
+    // auto *B3 = pw.createBody<phys::RigidBody>(6.0f * glm::vec3( 0, +0.02, +1) + glm::vec3(0, 128, 0));
 
-    // pw.createConstraint<phys::SpringConstraint>(m_body, B0, B0->state.pos, 0.1, 0.4);
-    // pw.createConstraint<phys::SpringConstraint>(m_body, B1, B1->state.pos, 0.1, 0.4);
-    // pw.createConstraint<phys::SpringConstraint>(m_body, B2, B2->state.pos, 0.1, 0.4);
-    // pw.createConstraint<phys::SpringConstraint>(m_body, B3, B3->state.pos, 0.1, 0.4);
+
+    // B0->applyImpulseLinear(-0.5f*B0->state.pos);
+    // B1->applyImpulseLinear(-0.5f*B1->state.pos);
+    // B2->applyImpulseLinear(-0.5f*B2->state.pos);
+    // B3->applyImpulseLinear(-0.5f*B3->state.pos);
+
+    // pw.createConstraint<phys::SpringConstraint>(m_body, B0, glm::vec3(-8, -12,  8), 0.25, 0.4);
+    // pw.createConstraint<phys::SpringConstraint>(m_body, B1, glm::vec3(+8, -12,  8), 0.25, 0.4);
+    // pw.createConstraint<phys::SpringConstraint>(m_body, B2, glm::vec3(-8, -12, -8), 0.25, 0.4);
+    // pw.createConstraint<phys::SpringConstraint>(m_body, B3, glm::vec3(+8, -12, -8), 0.25, 0.4);
+
+    // m_body->addChild(B0);
+    // m_body->addChild(B1);
+    // m_body->addChild(B2);
+    // m_body->addChild(B3);
+
+    // B0->setMass(2);
+    // B2->setMass(2);
+    // B3->setMass(2);
+    // B3->setMass(2);
+
 
     auto &ecs  = api.getECS();
     auto &msys = ecs.getSystem<idk::ModelSys>();
@@ -65,9 +84,11 @@ idk::Helicopter::update()
     tsys.rotateLocalAxis(m_rear, glm::vec3(1, 0, 0), glm::clamp(m_ctl.yaw, 0.5f, 4.0f));
     tsys.getTransform(m_obj) = idk::Transform::fromGLM(m_body->getRenderMatrix());
 
+    // ren.drawSphere(m_body->state.COM_world 8.0f);
+
 
     glm::vec3 vel = m_body->state.linear.vel;
-    glm::vec3 up  = glm::mix(m_body->getUp(), m_body->getFront(), 0.1f);
+    glm::vec3 up  = glm::mix(m_body->state.up, m_body->state.front, 0.1f);
     float     th  = 1.0f;
 
     if (glm::length2(vel) > 0.0f)
@@ -78,17 +99,17 @@ idk::Helicopter::update()
 
     float roll_force  = 0.0f;
     float pitch_force = 0.0f;
-    float tail_force  = 0.0f;
+    float yaw_force   = 0.0f;
     float throttle    = 0.0f;
 
 
     if (this->driver)
     {
-        roll_force  = 8.0f * m_ctl.roll;
-        pitch_force = 8.0f * m_ctl.pitch;
-        tail_force  = 1.0f * m_ctl.yaw;
+        roll_force  = 1.0f * m_ctl.roll;
+        pitch_force = 1.0f * m_ctl.pitch;
+        yaw_force   = 1.0f * m_ctl.yaw;
         throttle    = 2048.0f * m_ctl.throttle;
-        // throttle    = 10.0 * (9.81 * 2.0f * m_ctl.throttle);
+        // throttle    = (1.0f / m_body->state.invMass) * 9.8 * 1.75 * m_ctl.throttle; // * (9.81 * 2.0f * m_ctl.throttle);
 
         if (io.m_joystick_jhat[0] == 1) m_cam_pitch -= 0.35;
         if (io.m_joystick_jhat[0] == 4) m_cam_pitch += 0.35;
@@ -117,21 +138,15 @@ idk::Helicopter::update()
 
     while (accum > 1.0f / PW->config.tickrate)
     {
-        m_body->applyForceLinear(throttle * m_body->getUp());
+        auto yaw_pos   = tsys.getWorldPosition(m_rear);
+        auto roll_pos  = tsys.getWorldPosition(m_top) + m_body->state.up;
+        auto pitch_pos = tsys.getWorldPosition(m_obj) - m_body->state.front;
 
-
-        auto tail_pos = tsys.getWorldPosition(m_rear);
-        m_body->applyForceAngular(tail_force * m_body->getUp());
-        m_body->applyTorque(tail_pos, tail_force*tsys.getFront(m_rear));
-
-        auto top_pos = tsys.getWorldPosition(m_top) + tsys.getUp(m_obj);
-        m_body->applyTorque(top_pos, -pitch_force*m_body->getFront());
-
-        m_body->applyTorque(top_pos, -roll_force*m_body->getFront());
+        m_body->applyForceLinear(throttle * m_body->state.up);
     
-        // m_body->applyForceAngular(tail_force * m_body->getUp());
-        // m_body->applyForceAngular(roll_force * m_body->getFront());
-        // m_body->applyForceAngular(pitch_force * m_body->getRight());
+        m_body->applyForceAngular(yaw_force * m_body->state.up);
+        m_body->applyForceAngular(roll_force * -m_body->state.front);
+        m_body->applyForceAngular(pitch_force * m_body->state.right);
 
         accum -= 1.0f / PW->config.tickrate;
     }

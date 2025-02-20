@@ -22,16 +22,14 @@ EvoDevUI::rigid_bodies( idk::EngineAPI &api, idk::phys::World &world )
         auto &acc  = B->state.linear.acc;
         auto &avel = B->state.angular.vel;
         auto &aacc = B->state.angular.acc;
-        float mass = B->getMass();
-        float drag = B->getDrag();
-        float rest = B->getRestitution();
-        float grav = B->getGravScale();
+        float mass = 1.0f / B->state.invMass;
+        float drag = B->state.drag;
+        float rest = B->state.restitution;
 
         ImGui::Checkbox("Static",                 &B->m_static);
         ImGui::InputFloat("Mass",                 &mass);
         ImGui::InputFloat("Drag",                 &drag);
         ImGui::InputFloat("Restitution",          &rest);
-        ImGui::InputFloat("Gravity scale",        &grav);
         ImGui::DragFloat3("Position",             &pos[0], 0.05f);
         ImGui::DragFloat3("Velocity",             &vel[0]);
         ImGui::DragFloat3("Acceleration",         &acc[0]);
@@ -44,10 +42,62 @@ EvoDevUI::rigid_bodies( idk::EngineAPI &api, idk::phys::World &world )
         //     B->setPosition(pos);
         // }
 
-        // if (mass != B->getMass())
+        if (1.0f/mass != B->state.invMass)
+        {
+            B->state.invMass = 1.0f/mass;
+        }
+        if (drag != B->state.drag)
+        {
+            // B->setMass(drag);
+        }
+
+        ImGui::PopID();    
+        ImGui::Spacing();
+    }
+
+    ImGui::End();
+
+    ImGui::Begin("Static Bodies");
+
+    for (auto *B: world.staticBodies())
+    {
+        std::string label = "Static Body " + std::to_string(B->getID());
+
+        ImGui::PushID(B->getID());
+        ImGui::Text(label.c_str());
+
+        auto &pos  = B->state.pos;
+        auto &vel  = B->state.linear.vel;
+        auto &acc  = B->state.linear.acc;
+        auto &avel = B->state.angular.vel;
+        auto &aacc = B->state.angular.acc;
+        float mass = 1.0f / B->state.invMass;
+        float drag = B->state.drag;
+        float rest = B->state.restitution;
+
+        ImGui::InputFloat("Mass",                 &mass);
+        ImGui::InputFloat("Drag",                 &drag);
+        ImGui::InputFloat("Restitution",          &rest);
+        ImGui::DragFloat3("Position",             &pos[0], 0.05f);
+        ImGui::DragFloat3("Velocity",             &vel[0]);
+        ImGui::DragFloat3("Acceleration",         &acc[0]);
+        ImGui::DragFloat3("Angular Velocity",     &avel[0]);
+        ImGui::DragFloat3("Angular Acceleration", &aacc[0]);
+        // ImGui::DragFloat3("Forces",               &(B->getForce()[0]));
+
+        // if (pos != B->getPosition())
         // {
-        //     B->setMass(mass);
+        //     B->setPosition(pos);
         // }
+
+        if (1.0f/mass != B->state.invMass)
+        {
+            B->state.invMass = 1.0f/mass;
+        }
+        if (drag != B->state.drag)
+        {
+            // B->setMass(drag);
+        }
 
         ImGui::PopID();    
         ImGui::Spacing();

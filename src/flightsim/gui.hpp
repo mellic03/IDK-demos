@@ -25,7 +25,7 @@ private:
     idkui::TextAbsolute  *m_prompt;
 
 public:
-    GUI();
+    GUI( idk::EngineAPI& );
     void update( idk::EngineAPI&, evo::Player* );
 };
 

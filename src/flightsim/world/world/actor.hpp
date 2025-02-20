@@ -19,6 +19,7 @@ public:
     virtual ~Actor();
 
     virtual void update();
+    virtual void fixedUpdate( float timestep );
     virtual void render( idk::RenderEngine& );
 
     int   actorID()  { return m_ID;    }

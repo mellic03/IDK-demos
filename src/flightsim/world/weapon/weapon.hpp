@@ -64,7 +64,8 @@ public:
     void show();
     void hide();
 
-    virtual bool fire();
+    virtual void fire();
+    bool canFire() { return m_timer <= 0.0f; }
 
 };
 
@@ -118,7 +119,7 @@ public:
     float intensity = 4.0f;
 
     WeaponFlashlight( idk::EngineAPI&, World& );
-    virtual bool fire() final;
+    virtual void fire() final;
 };
 
 
