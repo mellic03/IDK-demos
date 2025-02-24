@@ -6,6 +6,8 @@
 
 namespace idk
 {
+    class Joystick;
+
     struct AircraftCtl;
     class Aircraft;
 }
@@ -18,6 +20,10 @@ struct idk::AircraftCtl
     float pitch    = 0.0f;
     float roll     = 0.0f;
     float yaw      = 0.0f;
+
+    float cam_pitch = 0.0f;
+    float cam_roll  = 0.0f;
+    float cam_yaw   = 0.0f;
 };
 
 
@@ -29,7 +35,7 @@ protected:
     phys::RigidBody *m_body;
 
     int  m_callback_id;
-    void _jscallback( uint8_t, float );
+    void _jscallback( const idk::Joystick& );
 
     
 public:

@@ -3,6 +3,8 @@
 
 #include <IDKECS/IDKECS.hpp>
 #include <IDKIO/IDKIO.hpp>
+#include <IDKIO/device/joystick.hpp>
+
 #include <IDKBuiltinCS/sys-model.hpp>
 #include <IDKBuiltinCS/sys-script.hpp>
 #include <IDKBuiltinCS/sys-transform.hpp>
@@ -11,37 +13,39 @@
 
 
 void
-idk::Aircraft::_jscallback( uint8_t axis, float value )
+idk::Aircraft::_jscallback( const idk::Joystick &JS )
 {
-    // scale value to [0, 1] range
-    value = (value + 32768) / (32767 + 32768);
+    // m_ctl.roll     = JS.stick.roll;
+    // m_ctl.pitch    = JS.stick.pitch;
+    // m_ctl.yaw      = JS.stick.yaw;
+    // m_ctl.throttle = JS.stick.throttle;
 
-    switch (axis)
-    {
-        default: break;
-        case 0: m_ctl.roll     = 2.0f * (value-0.5f); break;
-        case 1: m_ctl.pitch    = 2.0f * (value-0.5f); break;
-        case 2: m_ctl.yaw      = 2.0f * (value-0.5f); break;
-        case 3: m_ctl.throttle = value; break;
-    }
+    // if (JS.hat[0] == 1) m_ctl.cam_pitch -= M_PI / 12.0;
+    // if (JS.hat[0] == 4) m_ctl.cam_pitch += M_PI / 12.0;
+    // if (JS.hat[0] == 8) m_ctl.cam_yaw   -= M_PI / 6.0;
+    // if (JS.hat[0] == 2) m_ctl.cam_yaw   += M_PI / 6.0;
+
 }
-
 
 
 idk::Aircraft::Aircraft( idk::EngineAPI &api, idk::World &world, const glm::vec3 &p )
 :   Vehicle(api, world, p),
     m_body(world.physworld->createBody<phys::RigidBody>(p, phys::SHAPE_SPHERE))
 {
+    using JE = idk::JoystickEvent;
     auto &io = api.getIO();
 
-    m_callback_id = io.onJoystickAxis(
-        [this](uint8_t a, float b) { return _jscallback(a, b); }
-    );
+    // auto *jstick = io.openDevice<idk::Joystick>(0);
+
+    // jstick->on(JE::PITCH, [this](Joystick *J) {std::cout << "pitch"; m_ctl.pitch = J->stick.pitch; })
+    //        .on(JE::ROLL,  [this](Joystick *J) {std::cout << "roll"; m_ctl.roll  = J->stick.roll;  })
+    //        .on(JE::YAW,   [this](Joystick *J) {std::cout << "yaw"; m_ctl.yaw   = J->stick.yaw;   });
+
 }
 
 
 idk::Aircraft::~Aircraft()
 {
-    auto &io = m_api.getIO();
-    io.removeCallback(m_callback_id);
+    // auto &io = m_api.getIO();
+    // io.removeCallback(m_callback_id);
 }

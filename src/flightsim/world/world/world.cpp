@@ -1,5 +1,6 @@
 #include "world.hpp"
 #include "character.hpp"
+#include "vehicle.hpp"
 #include "item.hpp"
 #include <IDKIO/IDKIO.hpp>
 

@@ -9,15 +9,30 @@
 #include <IDKPhysics/IDKPhysics.hpp>
 #include <libidk/idk_wallocator2.hpp>
 #include <libidk/idk_vector2.hpp>
+#include <libidk/idk_eventemitter.hpp>
+#include <libidk/idk_memory.hpp>
 #include <vector>
 
 
-class idk::World
+namespace idk
+{
+    struct WorldEvent {
+        enum internal_enum {
+            PAUSE = 1,
+
+            ENABLE  = 1<<16,
+            DISABLE = 1<<17,
+            TOGGLE  = 1<<18
+        };
+    };
+}
+
+
+class idk::World: public idk::EventEmitter<uint32_t, World>
 {
 private:
-    idk::vector2<Actor*>     m_actors;
-    idk::vector2<Character*> m_characters;
-    // std::vector<Item*>      m_items;
+    std::vector<Actor*>     m_actors;
+    std::vector<Character*> m_characters;
     idk::WAllocator2<Item>  m_items;
     std::vector<Vehicle*>   m_vehicles;
 

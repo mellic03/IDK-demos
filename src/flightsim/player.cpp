@@ -5,6 +5,8 @@
 
 #include <IDKGameEngine/IDKGameEngine.hpp>
 #include <IDKIO/IDKIO.hpp>
+#include <IDKIO/device/playstation.hpp>
+
 #include <IDKBuiltinCS/sys-audio.hpp>
 #include <IDKBuiltinCS/sys-camera.hpp>
 #include <IDKBuiltinCS/sys-transform.hpp>
@@ -13,10 +15,15 @@
 
 
 
+static idk::DS4 *ds4;
+static idk::DS5 *ds5;
+
+
 evo::Player::Player( idk::EngineAPI &api, idk::World &world, const glm::vec3 &p )
 :   idk::Character(api, world, p),
     m_cam(m_head_obj)
 {
+    auto &io   = api.getIO();
     auto &ecs  = api.getECS();
     auto &asys = ecs.getSystem<idk::AudioSys>();
     auto &tsys = ecs.getSystem<idk::TransformSys>();
@@ -47,7 +54,19 @@ evo::Player::Player( idk::EngineAPI &api, idk::World &world, const glm::vec3 &p 
     m_ctl.equip_idx = 2;
 
     _setupKeyboardCallbacks();
-    _setupGamepadCallbacks();
+
+    // ds4 = io.openDevice<idk::DS4>(0, [this, &io]() {
+    //     ds5 = io.openDevice<idk::DS5>(1, [this, &io]() {
+    //         _setupGamepadCallbacks();
+    //     });
+    // });
+
+    ds4 = io.createController<idk::DS4>();
+    ds5 = io.createController<idk::DS5>();
+
+    ds4->onListen = [this]() { _setupGamepadCallbacks(ds4); };
+    ds5->onListen = [this]() { _setupGamepadCallbacks(ds5); };
+
 }
 
 
@@ -83,7 +102,10 @@ evo::Player::update()
     if (io.mouseCaptured())
         _keyboardControl();
     else
-        _gamepadControl();
+    {
+        _gamepadControl(ds4);
+        _gamepadControl(ds5);
+    }
 
     Character::update();
 
@@ -192,50 +214,53 @@ evo::Player::_keyboardControl()
 
 
 
+
 void
-evo::Player::_gamepadControl()
+evo::Player::_gamepadControl( idk::Gamepad *G )
 {
     using namespace idk;
 
     auto &io   = m_api.getIO();
     float dt   = m_api.dtime();
-    auto &gpad = io.getGamepad();
 
-    if (gpad.isOpen() == false)
+    if (!G || G->dev == nullptr)
     {
         return;
     }
 
-    glm::vec3 lstick = 0.25f * glm::vec3(gpad.lstick.x, 0.0f, gpad.lstick.y);
-    glm::vec3 rstick = -glm::vec3(gpad.rstick.x, gpad.rstick.y, 0.0f);
+
+    glm::vec3 lstick = 0.25f * glm::vec3(G->lstick.x, 0.0f, G->lstick.y);
+    glm::vec3 rstick = -glm::vec3(G->rstick.x, G->rstick.y, 0.0f);
 
     m_ctl.dmove = idk::flerp(m_ctl.dmove, lstick, dt, m_ctl.move_growth);
     m_ctl.dlook = idk::flerp(m_ctl.dlook, rstick, dt, m_ctl.look_growth);
 
-    if (io.gamepadButtonDown(Gamepad::BTN_A))
+    if (G->buttonDown(GamepadEvent::BTN_A))
         m_ctl.dmove.y = idk::flerp(m_ctl.dmove.y, +0.25f, m_api.dtime(), m_ctl.move_growth);
 
-    else if (io.gamepadButtonDown(Gamepad::BTN_B))
+    else if (G->buttonDown(GamepadEvent::BTN_B))
         m_ctl.dmove.y = idk::flerp(m_ctl.dmove.y, -0.25f, m_api.dtime(), m_ctl.move_growth);
 
 
     float factor = 0.0f;
-    if (io.gamepadButtonDown(Gamepad::BTN_RSHOULDER))
-        factor = 1.0f;
-    m_ctl.zoom_factor = idk::flerp(m_ctl.zoom_factor, factor, dt, 0.25f);
-    
 
     if (m_weapon)
     {
-        if (gpad.ltrigger.x > 0.25f)
+        if (G->ltrigger.x > 0.25f)
+        {
+            factor = 1.0f;
             m_weapon->aim();
+        }
         else
+        {
             m_weapon->unaim();
+        }
 
-        if (gpad.rtrigger.x > 0.25f && m_weapon->canFire())
+        if (G->rtrigger.x > 0.25f && m_weapon->canFire())
             m_weapon->fire();
     }
 
+    m_ctl.zoom_factor = idk::flerp(m_ctl.zoom_factor, factor, dt, 0.25f);
 }
 
 
@@ -247,7 +272,7 @@ evo::Player::_setupKeyboardCallbacks()
     using namespace idk;
     auto &io = m_api.getIO();
 
-    int id0 = io.onMouseMotion([this](float x, float y) {
+    auto id0 = io.onMouseMotion([this](float x, float y) {
         if (m_api.getIO().mouseCaptured())
         {
             float dt = m_api.dtime();
@@ -260,19 +285,32 @@ evo::Player::_setupKeyboardCallbacks()
 
 
 void
-evo::Player::_setupGamepadCallbacks()
+evo::Player::_setupGamepadCallbacks( idk::Gamepad *G )
 {
     using namespace idk;
-    auto &io = m_api.getIO();
+    using GE = GamepadEvent;
+    using WE = WorldEvent;
 
-    int id0 = io.onGamepadButton(IO::GPAD_TAP, [this](uint32_t btn) {
-        if (btn == Gamepad::BTN_B)
-        {
-            m_ctl.crouching = !m_ctl.crouching;
-        }
-    });
+    uint32_t DWN = GE::BTN_DWN;
 
-    m_callbacks.push_back(id0);
+    // ds5->setProperty(DS5Trigger::LEFT,  DS5Property::TRIGGER_MODE, DS5Value::DISABLED);
+    // ds5->setProperty(DS5Trigger::RIGHT, DS5Property::TRIGGER_MODE, DS5Value::DISABLED);
+
+    // SDL_GameControllerRumbleTriggers(gpad->dev->impl, 0xFFFF, 0xFFFF, 1000);
+    // if (SDL_GameControllerRumble(gpad->dev->impl, 0xFFFF, 0xFFFF, 1000) == -1)
+    // {
+    //     std::cout << "Shiet" << std::endl;
+    //     exit(1);
+    // }
+
+    // gpad->on(DWN|GE::BTN_BACK, [this]() {
+    //     gpad = (gpad == ds4) ? dynamic_cast<Gamepad*>(ds5) : dynamic_cast<Gamepad*>(ds4);
+    // });
+
+    G->on(DWN|GE::BTN_A,     [this]() { m_ctl.dmove.y += 2.0f;                })
+      .on(DWN|GE::BTN_B,     [this]() { m_ctl.crouching = !m_ctl.crouching;   })
+      .on(DWN|GE::BTN_START, [this]() { m_world.emit(WE::TOGGLE | WE::PAUSE); });
+
 }
 
 

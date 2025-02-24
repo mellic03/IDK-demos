@@ -31,6 +31,6 @@ public:
 
     Airfoil( idk::phys::World &world, float span=3.8f, float chord=1.26f );
 
-    glm::vec3 computeAeroForcesLinear( const glm::mat4 &parent );
+    glm::vec3 computeAeroForcesLinear( const glm::mat4 &parent, const glm::vec3 &pvel );
     glm::mat4 getRenderMatrix( const glm::mat4 &parent );
 };

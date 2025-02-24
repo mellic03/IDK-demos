@@ -52,7 +52,6 @@ target_link_libraries(
     IDKEvents
     IDKBuiltinCS
     IDKBuiltinUI
-    # IDKEditorUI
     IDKECS
     IDKPhysics
 )

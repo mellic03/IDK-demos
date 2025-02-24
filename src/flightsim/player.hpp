@@ -6,10 +6,10 @@
 #include <string>
 #include <functional>
 
-
 namespace idk
 {
     class ECS;
+    class Gamepad;
 }
 
 namespace evo
@@ -34,9 +34,9 @@ private:
     std::vector<int> m_callbacks;
 
     void _setupKeyboardCallbacks();
-    void _setupGamepadCallbacks();
+    void _setupGamepadCallbacks( idk::Gamepad* );
     void _keyboardControl();
-    void _gamepadControl();
+    void _gamepadControl( idk::Gamepad* );
 
 
 

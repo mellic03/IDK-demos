@@ -105,30 +105,30 @@ idk::Helicopter::update()
 
     if (this->driver)
     {
-        roll_force  = 1.0f * m_ctl.roll;
-        pitch_force = 1.0f * m_ctl.pitch;
-        yaw_force   = 1.0f * m_ctl.yaw;
-        throttle    = 2048.0f * m_ctl.throttle;
-        // throttle    = (1.0f / m_body->state.invMass) * 9.8 * 1.75 * m_ctl.throttle; // * (9.81 * 2.0f * m_ctl.throttle);
+        // roll_force  = 1.0f * m_ctl.roll;
+        // pitch_force = 1.0f * m_ctl.pitch;
+        // yaw_force   = 1.0f * m_ctl.yaw;
+        // throttle    = 2048.0f * m_ctl.throttle;
+        // // throttle    = (1.0f / m_body->state.invMass) * 9.8 * 1.75 * m_ctl.throttle; // * (9.81 * 2.0f * m_ctl.throttle);
 
-        if (io.m_joystick_jhat[0] == 1) m_cam_pitch -= 0.35;
-        if (io.m_joystick_jhat[0] == 4) m_cam_pitch += 0.35;
-        if (io.m_joystick_jhat[0] == 8) m_cam_yaw -= 0.35;
-        if (io.m_joystick_jhat[0] == 2) m_cam_yaw += 0.35;
+        // if (io.m_joystick_jhat[0] == 1) m_cam_pitch -= 0.35;
+        // if (io.m_joystick_jhat[0] == 4) m_cam_pitch += 0.35;
+        // if (io.m_joystick_jhat[0] == 8) m_cam_yaw -= 0.35;
+        // if (io.m_joystick_jhat[0] == 2) m_cam_yaw += 0.35;
 
-        int cam = this->driver->headObjID();
-        tsys.getTransformCmp(cam).pitch = -m_cam_pitch;
-        tsys.getTransformCmp(cam).yaw   = -m_cam_yaw;
+        // int cam = this->driver->headObjID();
+        // tsys.getTransformCmp(cam).pitch = -m_cam_pitch;
+        // tsys.getTransformCmp(cam).yaw   = -m_cam_yaw;
 
-        if (io.m_joystick_btndown[0] == true)
-        {
-            tsys.getLocalPosition(cam) = glm::vec3(0.0, -8.0, 16.0);
-        }
+        // if (io.m_joystick_btndown[0] == true)
+        // {
+        //     tsys.getLocalPosition(cam) = glm::vec3(0.0, -8.0, 16.0);
+        // }
 
-        else
-        {
-            tsys.getLocalPosition(cam) = glm::vec3(0.0, 0.0, 0.0);
-        }
+        // else
+        // {
+        //     tsys.getLocalPosition(cam) = glm::vec3(0.0, 0.0, 0.0);
+        // }
     }
 
 

@@ -25,13 +25,16 @@ private:
     evo::GUI    *gameui   = nullptr;
     idk::World  *world    = nullptr;
     evo::Player *player   = nullptr;
+    bool m_paused = false;
 
 
 public:
 
     virtual std::string getName() final { return "Evolution"; }
 
-    // virtual void registerModules ( idk::EngineAPI& ) final;
+    void registerCallbacks( idk::EngineAPI& );
+
+    // virtual void loadModules ( idk::EngineAPI& ) final;
     virtual void setup           ( idk::EngineAPI& ) final;
     virtual void mainloop        ( idk::EngineAPI& ) final;
     virtual void shutdown        (                 ) final;

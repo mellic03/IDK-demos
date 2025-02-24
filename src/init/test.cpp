@@ -7,7 +7,7 @@
 extern "C"
 int script( idk::EngineAPI &api, void* )
 {
-    // api.getEngine().registerModule("IDKGE/modules/libIDKBuiltinUI");
+    // api.getEngine().loadModule("IDKGE/modules/libIDKBuiltinUI");
     // std::cout << "Test script!!!";
 
     return 0;

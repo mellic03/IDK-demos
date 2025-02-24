@@ -7,8 +7,8 @@
 
 idk::Airfoil::Airfoil( idk::phys::World &world, float span, float chord )
 :   m_world         (world),
-    m_span          (8.0f*span),
-    m_chord         (8.0f*chord),
+    m_span          (4.0f*span),
+    m_chord         (4.0f*chord),
     m_area          (m_span*m_chord),
     m_aspect_ratio  (glm::sqrt(m_span) / m_area),
     m_flap_ratio    (0.25f)
@@ -195,7 +195,7 @@ idk::Airfoil::_sampleLiftDragCoefficients( float aoa )
 
 
 glm::vec3
-idk::Airfoil::computeAeroForcesLinear( const glm::mat4 &parent )
+idk::Airfoil::computeAeroForcesLinear( const glm::mat4 &parent, const glm::vec3 &pvel )
 {
     auto &conf = m_world.config;
 
@@ -206,7 +206,8 @@ idk::Airfoil::computeAeroForcesLinear( const glm::mat4 &parent )
 
     transform = parent * T*R;
     worldpos = transform[3];
-    glm::vec3 vel = worldpos - prevpos;
+    // glm::vec3 vel = worldpos - prevpos;
+    glm::vec3 vel = pvel;
     prevpos = worldpos;
 
 

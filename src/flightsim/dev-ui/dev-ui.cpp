@@ -1,4 +1,6 @@
 #include "dev-ui.hpp"
+#include <IDKIO/IDKIO.hpp>
+
 #include <flightsim/world/world/character.hpp>
 #include <flightsim/world/world/vehicle.hpp>
 #include <idk_imgui/imgui.hpp>
@@ -210,33 +212,60 @@ EvoDevUI::entities( idk::EngineAPI &api, idk::World &world )
 
 
 void
-EvoDevUI::scripts( idk::EngineAPI &api )
+EvoDevUI::devices( idk::EngineAPI &api )
 {
-    // static bool first = true;
-    // auto &script = idk::Weapon::config_script;
- 
-    // if (first)
-    // {
-    //     first = false;
-    //     script.execute(api, nullptr);
-    // }
+    ImGui::Begin("Devices");
 
-    ImGui::Begin("Scripts REE");
+    auto &io = api.getIO();
 
-    // if (script.is_ready() == false)
-    // {
-    //     ImGui::Button("Loading...");
-    // }
+    static std::string name;
+    static uint16_t data[4] = {0, 0, 0, 0};
+    static const char *labels[4] = {"Vendor", "Product", "Version", "Firmware"};
 
-    // else
-    // {
-    //     script.execute(api, nullptr);
+    for (auto &[key, dev]: io.getDevices())
+    {
+        if (dev->isValid() == false)
+        {
+            continue;
+        }
 
-    //     if (ImGui::Button("Reload"))
-    //     {
-    //         script.reload();
-    //     }
-    // }
+        if (!dev->getProductInfo(&name, &data[0], &data[1], &data[2], &data[3]))
+        {
+            name = "Unknown Device";
+
+            for (int i=0; i<4; i++)
+            {
+                data[i] = 0;
+            }
+        }
+
+        if (ImGui::BeginTable("IO Devices", 2, ImGuiTableFlags_RowBg))
+        {
+            ImGui::TableNextRow();
+            ImGui::PushID(key);
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("Name: %s", name.c_str());
+
+            for (int i=0; i<4; i++)
+            {
+                ImGui::TableNextRow();
+
+                ImGui::TableSetColumnIndex(0);
+                ImGui::Text(labels[i]);
+
+                ImGui::TableSetColumnIndex(1);
+                ImGui::Text("%#04x", data[i]);
+            }
+        
+            ImGui::PopID();
+            ImGui::EndTable();
+        }
+
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+        ImGui::Spacing();
+    }
 
     ImGui::End();
 }

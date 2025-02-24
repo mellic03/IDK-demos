@@ -13,5 +13,7 @@ namespace EvoDevUI
     void world_settings( idk::EngineAPI&, idk::phys::World& );
     void entities( idk::EngineAPI&, idk::World& );
     void scripts( idk::EngineAPI& );
+    void devices( idk::EngineAPI& );
+
 }
 

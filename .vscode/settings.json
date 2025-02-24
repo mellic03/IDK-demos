@@ -95,7 +95,8 @@
         "shared_mutex": "cpp",
         "codecvt": "cpp",
         "iomanip": "cpp",
-        "coroutine": "cpp"
+        "coroutine": "cpp",
+        "stdfloat": "cpp"
     },
     "C_Cpp.default.includePath": [
         "${default}",
@@ -106,4 +107,5 @@
         "${workspaceFolder}/external/libidk/src/",
         "${workspaceFolder}/src/"
     ],
+    "C_Cpp.default.cppStandard": "c++23",
 }

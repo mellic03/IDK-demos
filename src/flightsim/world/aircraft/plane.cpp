@@ -12,7 +12,7 @@
 #include <libidk/idk_math.hpp>
 
 
-static idk::Airfoil *A0, *A1;
+static idk::Airfoil *A0, *A1, *Tail;
 
 
 idk::FighterJet::FighterJet( idk::EngineAPI &api, idk::World &world, const glm::vec3 &p )
@@ -33,9 +33,11 @@ idk::FighterJet::FighterJet( idk::EngineAPI &api, idk::World &world, const glm::
     auto &pw = *(world.physworld);
     A0 = new idk::Airfoil(pw);
     A1 = new idk::Airfoil(pw);
+    // Tail = new idk::Airfoil(pw);
     
     A0->localpos = glm::vec3(-16, 0, 1);
     A1->localpos = glm::vec3(+16, 0, 1);
+    // Tail->localpos = glm::vec3(0, 8, -16);
 }
 
 
@@ -52,31 +54,56 @@ idk::FighterJet::update()
 
     ren.drawRect(A0->getRenderMatrix(m_body->state.T));
     ren.drawRect(A1->getRenderMatrix(m_body->state.T));
+    // ren.drawRect(Tail->getRenderMatrix(m_body->state.T));
+
+
+
+    float throttle = 2048.0f * m_ctl.throttle;
+    float pitch    = 0.5f  * m_ctl.pitch;
+    float roll     = 0.5f   * m_ctl.roll;
+    float yaw      = 0.5f  * m_ctl.yaw;
+
+    m_body->applyForceLinear(throttle * m_body->state.front);
+    // m_body->applyForceAngular(pitch * m_body->state.right);
+    // m_body->applyForceAngular(-roll * m_body->state.front);
+    // m_body->applyForceAngular(yaw * m_body->state.up);
+
+    A0->wingAngle = +roll + pitch;
+    A1->wingAngle = -roll + pitch;
+    // Tail->wingAngle = yaw;
+
+    glm::mat3 Ti3 = glm::mat3(m_body->state.Ti);
+    glm::vec3 aero0 = Ti3 * A0->computeAeroForcesLinear(m_body->state.T, m_body->state.measured.vel);
+    glm::vec3 aero1 = Ti3 * A1->computeAeroForcesLinear(m_body->state.T, m_body->state.measured.vel);
+
+    // m_body->applyForceLinear(aero0 + aero1);
+    m_body->state.applyPointForce(aero0, A0->localpos);
+    m_body->state.applyPointForce(aero1, A1->localpos);
+    // m_body->applyForceAngular(aero1, A1->worldpos);
+
 
 
     if (this->driver)
     {
-        static float m_cam_pitch = 0.0f;
-        static float m_cam_yaw   = 0.0f;
+        static float curr_pitch = 0.0f;
+        static float curr_yaw   = 0.0f;
 
-        if (io.m_joystick_jhat[0] == 1) m_cam_pitch -= 0.35;
-        if (io.m_joystick_jhat[0] == 4) m_cam_pitch += 0.35;
-        if (io.m_joystick_jhat[0] == 8) m_cam_yaw -= 0.35;
-        if (io.m_joystick_jhat[0] == 2) m_cam_yaw += 0.35;
+        curr_pitch = idk::flerp(curr_pitch, m_ctl.cam_pitch, dt, 0.75f);
+        curr_yaw   = idk::flerp(curr_yaw, m_ctl.cam_yaw, dt, 0.75f);
 
         int cam = this->driver->headObjID();
-        tsys.getTransformCmp(cam).pitch = -m_cam_pitch;
-        tsys.getTransformCmp(cam).yaw   = -m_cam_yaw;
+        tsys.getTransformCmp(cam).pitch = -curr_pitch;
+        tsys.getTransformCmp(cam).yaw   = -curr_yaw;
 
-        if (io.m_joystick_btndown[0] == true)
-        {
-            tsys.getLocalPosition(cam) = glm::vec3(0.0, 8.0, 64.0);
-        }
+        // if (io.m_joystick_btndown[0] == true)
+        // {
+        //     tsys.getLocalPosition(cam) = glm::vec3(0.0, 8.0, 64.0);
+        // }
 
-        else
-        {
-            tsys.getLocalPosition(cam) = glm::vec3(0.0, 0.0, 0.0);
-        }
+        // else
+        // {
+        //     tsys.getLocalPosition(cam) = glm::vec3(0.0, 0.0, 0.0);
+        // }
     }
 }
 
@@ -89,26 +116,6 @@ idk::FighterJet::fixedUpdate( float timestep )
     {
         return;
     }
-
-    float throttle = 128.0f * m_ctl.throttle;
-    float pitch    = 1.0f   * m_ctl.pitch;
-    float roll     = 1.0f   * (m_ctl.roll+0.5f); // [0, 1] range
-    float yaw      = 1.0f   * m_ctl.yaw;
-
-    m_body->applyForceLinear(throttle * m_body->state.front);
-    m_body->applyForceAngular(pitch * m_body->state.right);
-    // m_body->applyForceAngular(-roll * m_body->state.front);
-    // m_body->applyForceAngular(yaw * m_body->state.up);
-
-    A0->wingAngle = roll;
-    A1->wingAngle = -roll;
-
-    glm::vec3 aero0 = A0->computeAeroForcesLinear(m_body->state.T);
-    glm::vec3 aero1 = A1->computeAeroForcesLinear(m_body->state.T);
-
-    m_body->applyForceLinear(aero0 + aero1);
-    m_body->applyForceAngular(aero0, A0->worldpos);
-    m_body->applyForceAngular(aero1, A1->worldpos);
 
 }
 
