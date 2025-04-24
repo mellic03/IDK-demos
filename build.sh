@@ -12,6 +12,7 @@ cd ../../
 
 cd build
 cmake cmake -D CMAKE_BUILD_TYPE=DEBUG -D IDK_DEBUG=ON -G Ninja ../
+# cmake cmake -D CMAKE_BUILD_TYPE=RELEASE -G Ninja ../
 ninja
 cd ../
 

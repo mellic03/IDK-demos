@@ -3,7 +3,7 @@
 #include <libidk/idk_assert.hpp>
 #include <libidk/idk_module.hpp>
 #include <libidk/idk_game.hpp>
-
+#include <IDKGameEngine/IDKGameEngine.hpp>
 #include <string>
 
 namespace idk

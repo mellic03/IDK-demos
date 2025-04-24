@@ -26,8 +26,7 @@ idk::WeaponFlashlight::WeaponFlashlight( idk::EngineAPI &api, World &world )
     auto &ecs = api.getECS();
     auto &asys = ecs.getSystem<idk::AudioSys>();
     auto &ssys = ecs.getSystem<idk::ScriptSys>();
-
-    ssys.attachScript(m_obj, "assets/scripts/flashlight-config", dynamic_cast<void*>(this));
+    // ssys.attachScript(m_obj, "assets/scripts/flashlight-config", dynamic_cast<void*>(this));
 
     ecs.giveComponent<idk::SpotlightCmp>(m_obj);
     auto &cmp = ecs.getComponent<idk::SpotlightCmp>(m_obj);

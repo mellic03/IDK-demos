@@ -53,6 +53,7 @@ add_definitions(
 
 
 include_directories(${CMAKE_SOURCE_DIR}/external/glew-2.1.0/include/)
+include_directories(${CMAKE_SOURCE_DIR}/external/glm/)
 include_directories(${CMAKE_SOURCE_DIR}/external/libidk/src/)
 include_directories(${CMAKE_SOURCE_DIR}/external/IDKPhysics/src/)
 include_directories(${CMAKE_SOURCE_DIR}/external/IDKGraphics/src/)

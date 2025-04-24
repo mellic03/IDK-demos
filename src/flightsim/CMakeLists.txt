@@ -19,19 +19,13 @@ file(GLOB SOURCES
 )
 
 
-add_library(${PROJECT_NAME} SHARED ${SOURCES})
 
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_23)
+add_executable(${PROJECT_NAME} ${SOURCES})
 
-set_target_properties(
-    ${PROJECT_NAME} PROPERTIES
-    POSITION_INDEPENDENT_CODE ON
-)
-
-set_target_properties(
-    ${PROJECT_NAME} PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY ${IDK_OUTPUT_DIRECTORY}/
-)
+# set_target_properties(
+#     ${PROJECT_NAME} PROPERTIES
+#     POSITION_INDEPENDENT_CODE ON
+# )
 
 
 if (IDK_DEBUG)
@@ -41,24 +35,20 @@ else()
 endif ()
 
 
+# add_library(${PROJECT_NAME} SHARED ${SOURCES})
+
+set(OpenGL_GL_PREFERENCE GLVND)
+find_package(GLEW REQUIRED)
+find_package(OpenGL REQUIRED)
+
+
+include_directories(${GLEW_INCLUDE_DIRS})
+include_directories(${OPENGL_INCLUDE_DIRS})
+
 
 target_link_libraries(
     ${PROJECT_NAME} PUBLIC
-
-    libidk
-    IDKGraphics
-
-    IDKAudio
-    IDKEvents
-    IDKBuiltinCS
     IDKBuiltinUI
-    IDKECS
-    IDKPhysics
+    IDKGameEngine
 )
 
-
-
-FILE(
-    COPY ${CMAKE_CURRENT_SOURCE_DIR}/scripts
-    DESTINATION ${IDK_OUTPUT_DIRECTORY}/.
-)
